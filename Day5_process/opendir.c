@@ -38,35 +38,35 @@ int main(int argc, char** argv)
 
 
 		printf("the name: %s    the type: ", dir->d_name);
-		if (dir->d_type & DT_BLK)
+		if (dir->d_type == DT_BLK)
 		{
 			printf("block device");
 		}
-		else if (dir->d_type & DT_CHR)
+		else if (dir->d_type == DT_CHR)
 		{
 			printf("character device");
 		}
-		else if (dir->d_type & DT_DIR)
+		else if (dir->d_type == DT_DIR)
 		{
 			printf("directory");
 		}
-		else if(dir->d_type & DT_FIFO)
+		else if(dir->d_type == DT_FIFO)
 		{
 			printf("pipe");
 		}
-		else if (dir->d_type & DT_LNK)
+		else if (dir->d_type == DT_LNK)
 		{
 			printf("symbolic link");
 		}
-		else if (dir->d_type & DT_REG)
+		else if (dir->d_type == DT_REG)
 		{
 			printf("regular file");
 		}
-		else if (dir->d_type & DT_SOCK)
+		else if (dir->d_type == DT_SOCK)
 		{
 			printf("UNIX domain socket");
 		}
-		else if (dir->d_type & DT_UNKNOWN)
+		else if (dir->d_type == DT_UNKNOWN)
 		{
 			printf("could not be determined");
 		}
