@@ -71,7 +71,7 @@ int main(void)
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(8080);
 	//addr.sin_addr.s_addr = INADDR_ANY;
-	inet_pton(AF_INET, "192.168.56.1", &addr.sin_addr.s_addr);
+	inet_pton(AF_INET, "192.168.56.128", &addr.sin_addr.s_addr);
 
 	int ret = connect(sock_fd, (struct sockaddr*)&addr, sizeof(addr));
 	if(ret == -1)
