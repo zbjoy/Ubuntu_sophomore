@@ -40,7 +40,7 @@ int main(void)
 	{
 		printf("you can get client information......\n");
 		char buf[1024] = "";
-		int n = read(sock_fd, buf, sizeof(buf));	
+		int n = read(fd, buf, sizeof(buf));	
 		if(n == 0)
 		{
 			printf("no read.....\n");		
@@ -51,9 +51,12 @@ int main(void)
 	//	n = read(STDIN_FILENO, buf, sizeof(buf));
 		char hello[] = "i listen to you.....\n";
 		int num = read(STDIN_FILENO, buf, sizeof(buf));
-		write(sock_fd, buf, num);
+		write(fd, buf, num);
 		//write(sock_fd, hello, sizeof(hello));
 	}
+
+	close(fd);
+	close(sock_fd);
 
 	return 0;
 }
