@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
+#include <fcntl.h>
+#include <errno.h>
 
 int main(int argc, char** argv)
 {
@@ -60,7 +62,8 @@ int main(int argc, char** argv)
 	while(1)
 	{
 		memset(evs, 0, sizeof(evs));
-		ret  = epoll_wait(epfd, evs, 1024, -1);	
+		ret = epoll_wait(epfd, evs, 1024, -1);	
+		printf("epoll_wait.......\n");
 		if(ret <= 0)
 		{
 			perror("epoll_wait");	
@@ -82,22 +85,42 @@ int main(int argc, char** argv)
 				tempev.data.fd = temp_fd;
 				tempev.events = EPOLLIN;
 				epoll_ctl(epfd, EPOLL_CTL_ADD, temp_fd, &tempev);
+
+				int flags = fcntl(temp_fd, F_GETFL);
+				flags |= O_NONBLOCK;
+				fcntl(temp_fd, F_SETFL, flags);
 			}
 			else if(evs[i].data.fd != -1 && evs[i].events & EPOLLIN)
 			{
-				char buf[1500] = "";
-				int num = read(evs[i].data.fd, buf, sizeof(buf));		
-				if(num <= 0)
+				while(1)
 				{
-					struct epoll_event tempev;
-					printf("a client close.......\n");	
-					close(evs[i].data.fd);
-					epoll_ctl(epfd, EPOLL_CTL_DEL, evs[i].data.fd, &tempev);
-					continue;
-				}
+					char buf[3] = "";
+					int num = read(evs[i].data.fd, buf, sizeof(buf));		
+					if(num < 0)
+					{
+						if(errno == EAGAIN)
+						{
+							printf("数据已经读完......\n");
+							break;	
+						}
+					}
+					else if(num == 0)
+					{
+						struct epoll_event tempev;
+						printf("a client close.......\n");	
+						close(evs[i].data.fd);
+						epoll_ctl(epfd, EPOLL_CTL_DEL, evs[i].data.fd, &tempev);
+						break;	
+					}
+					else
+					{	
+						write(evs[i].data.fd, buf, num);
+						//printf("the client say: %s\n", buf);
+						write(STDOUT_FILENO, buf, num);
+					}
 
-				write(evs[i].data.fd, buf, num);
-				printf("the client say: %s\n", buf);
+						
+				}
 			}
 		}
 	}
