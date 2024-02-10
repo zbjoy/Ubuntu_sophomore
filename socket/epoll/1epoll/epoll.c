@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 
 	while(1)
 	{
-		//memset(allev, 0, sizeof(allev));
+		memset(allev, 0, sizeof(allev));
 		ret = epoll_wait(efd, allev, 1024, -1);	
 		printf("ret is %d\n", ret);
 		if(ret == -1)
