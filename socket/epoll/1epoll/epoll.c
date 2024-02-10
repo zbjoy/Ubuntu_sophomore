@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	short port = atoi(argv[2]);
-	int efd = epoll_create(1);
+	int efd = epoll_create(10);
 	int lfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(lfd == -1)
 	{
@@ -51,59 +51,87 @@ int main(int argc, char** argv)
 
 	while(1)
 	{
-		memset(allev, 0, sizeof(allev));
+		//memset(allev, 0, sizeof(allev));
 		ret = epoll_wait(efd, allev, 1024, -1);	
+		printf("ret is %d\n", ret);
 		if(ret == -1)
 		{
 			perror("epoll_wait");	
 			return 1;
 		}
 
-		if(allev[0].data.fd != -1)
-		{
-			if(allev[0].events & EPOLLIN)	
-			{
-				struct epoll_event tempev;
-				memset(&tempev, 0, sizeof(tempev));
+		//if(allev[0].data.fd != -1 && allev[0].events & EPOLLIN)
+		//{
+			//printf("allev[0].data.fd is %d ......\n", allev[0].data.fd);
+			//if(allev[0].events & EPOLLIN)	
+			//{
+				//struct epoll_event tempev;
+				//memset(&tempev, 0, sizeof(tempev));
 
-				struct sockaddr_in tempaddr;
-				memset(&tempaddr, 0, sizeof(tempaddr));
-				socklen_t templen = sizeof(tempaddr);
-				tempev.data.fd = accept(lfd, (struct sockaddr*)&tempaddr, &templen);
-				if(tempev.data.fd == -1)
-				{
-					perror("accept");	
-					return 1;
-				}
-				printf("a client connect ......\n");
-				tempev.events = EPOLLIN;
-				epoll_ctl(efd, EPOLL_CTL_ADD, tempev.data.fd, &tempev);	
-			}
-		}
-		int i = 1;
+				//struct sockaddr_in tempaddr;
+				//memset(&tempaddr, 0, sizeof(tempaddr));
+				//socklen_t templen = sizeof(tempaddr);
+				//tempev.data.fd = accept(lfd, (struct sockaddr*)&tempaddr, &templen);
+				//printf("accept ret is %d\n", tempev.data.fd);
+				//if(tempev.data.fd == -1)
+				//{
+					//perror("accept");	
+					//return 1;
+				//}
+				//printf("a client connect ......\n");
+				//tempev.events = EPOLLIN;
+				//epoll_ctl(efd, EPOLL_CTL_ADD, tempev.data.fd, &tempev);	
+			//}
+		//}
+		int i = 0;
 		
-		while(allev[i].data.fd != -1)
+		for(i = 0; i < ret; i++)	
 		{
+			printf("allev[i].data.fd is %d ......\n", allev[i].data.fd);
 			if(allev[i].events & EPOLLIN)
 			{
-				char buf[1024] = "";
-				int num = read(allev[i].data.fd, buf, sizeof(buf));
-				if(num <= 0)
+				if(allev[i].data.fd == lfd)
 				{
-					perror("read");	
-					close(allev[i].data.fd);
-					printf("a client close......\n");
-					i++;
-					continue;
+				
+					struct epoll_event tempev;
+					memset(&tempev, 0, sizeof(tempev));
+
+					struct sockaddr_in tempaddr;
+					memset(&tempaddr, 0, sizeof(tempaddr));
+					socklen_t templen = sizeof(tempaddr);
+					tempev.data.fd = accept(lfd, (struct sockaddr*)&tempaddr, &templen);
+					printf("accept ret is %d\n", tempev.data.fd);
+					if(tempev.data.fd == -1)
+					{
+						perror("accept");	
+						return 1;
+					}
+					printf("a client connect ......\n");
+					tempev.events = EPOLLIN;
+					epoll_ctl(efd, EPOLL_CTL_ADD, tempev.data.fd, &tempev);	
 				}
-				write(allev[i].data.fd, buf, num);	
-				printf("%s", buf);
-				fflush(stdout);
-				i++;	
+				else
+				{
+				
+					char buf[1024] = "";
+					int num = read(allev[i].data.fd, buf, sizeof(buf));
+					if(num <= 0)
+					{
+						perror("read");	
+						close(allev[i].data.fd);
+						printf("a client close......\n");
+						//i++;
+						continue;
+					}
+					write(allev[i].data.fd, buf, num);	
+					printf("%s", buf);
+					fflush(stdout);
+					//i++;	
+				}
 			}
 			else
 			{
-				i++;	
+				//i++;	
 			}
 		}
 		
