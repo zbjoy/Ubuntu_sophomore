@@ -107,6 +107,7 @@ void* client_fun(void* arg)
 		}
 	}
 
+	sleep(1);
 	close(info->client_fd);
 	free(info);
 
