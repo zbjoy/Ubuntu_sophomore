@@ -8,6 +8,7 @@
 
 
 #include <string.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <stdio.h>
 #include <signal.h>
@@ -29,6 +30,7 @@ static const char MESSAGE[] = "Hello, World!\n";
 
 static const int PORT = 9995;
 
+static void conn_readcb(struct bufferevent* bev, void* user_data);
 static void listener_cb(struct evconnlistener *, evutil_socket_t,
     struct sockaddr *, int socklen, void *);
 static void conn_writecb(struct bufferevent *, void *);
@@ -97,11 +99,26 @@ listener_cb(struct evconnlistener *listener, evutil_socket_t fd,
 		event_base_loopbreak(base);
 		return;
 	}
-	bufferevent_setcb(bev, NULL, conn_writecb, conn_eventcb, NULL);
-	bufferevent_enable(bev, EV_WRITE);
-	bufferevent_disable(bev, EV_READ);
+	bufferevent_setcb(bev, conn_readcb, conn_writecb, conn_eventcb, NULL);
+	//bufferevent_enable(bev, EV_WRITE);
+	bufferevent_enable(bev, EV_WRITE | EV_READ);
+	//bufferevent_disable(bev, EV_READ);
 
 	bufferevent_write(bev, MESSAGE, strlen(MESSAGE));
+}
+
+static void conn_readcb(struct bufferevent* bev, void* user_data)
+{
+	char buf[1500] = "";
+	unsigned int num = bufferevent_read(bev, buf, sizeof(buf));
+	if(num <= 0)
+	{
+		printf("conn_readcb error .......\n");	
+		exit(0);
+	}
+
+	bufferevent_write(bev, buf, num);
+	printf("%s", buf);
 }
 
 static void
@@ -109,8 +126,9 @@ conn_writecb(struct bufferevent *bev, void *user_data)
 {
 	struct evbuffer *output = bufferevent_get_output(bev);
 	if (evbuffer_get_length(output) == 0) {
-		printf("flushed answer\n");
-		bufferevent_free(bev);
+		//printf("flushed answer\n");
+		//bufferevent_free(bev);
+		printf("output is 0 .......\n");
 	}
 }
 

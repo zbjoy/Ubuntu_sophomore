@@ -18,7 +18,7 @@ int main(void)
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(8080);
-	inet_pton(AF_INET, "192.168.1.3", &addr.sin_addr.s_addr);
+	inet_pton(AF_INET, "192.168.56.128", &addr.sin_addr.s_addr);
 
 	socklen_t addrlen = (socklen_t)sizeof(addr);
 	int ret = connect(socket_fd, (struct sockaddr*)&addr, addrlen);
