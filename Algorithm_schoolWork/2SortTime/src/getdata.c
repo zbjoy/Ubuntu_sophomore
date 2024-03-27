@@ -13,7 +13,7 @@ int isDataHaving()
 
     struct timeval timeout;
     timeout.tv_sec = 0;
-    timeout.tv_usec = 0;
+    timeout.tv_usec = 200;
     int res = select(STDIN_FILENO + 1, &rfd, NULL, NULL, &timeout);
     if (res == -1)
     {
@@ -65,7 +65,7 @@ int getdata_pipe(int** nums, int* n)
 {
     if (!isDataHaving())
     {
-        getdata_file(nums, n, "/home/zbjoy/Ubuntu_sophomore/Algorithm_schoolWork/1Sort_time/res/dataset/data_1000");
+        getdata_file(nums, n, "../res/dataset/data_1000");
         return 0;
     }
 
