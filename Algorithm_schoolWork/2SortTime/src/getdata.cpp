@@ -65,7 +65,7 @@ int getdata_pipe(int** nums, int* n)
 {
     if (!isDataHaving())
     {
-        getdata_file(nums, n, "../res/dataset/data_1000");
+        getdata_file(nums, n, (char*)"../res/dataset/data_1000");
         return 0;
     }
 

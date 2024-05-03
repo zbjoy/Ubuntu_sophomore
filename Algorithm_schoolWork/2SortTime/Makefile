@@ -1,14 +1,14 @@
 TARTGET = ./bin/sort_test
-SRC = $(wildcard ./src/*.c)
-OBJS = $(patsubst ./src/%.c, ./obj/%.o, ${SRC})
+SRC = $(wildcard ./src/*.cpp)
+OBJS = $(patsubst ./src/%.cpp, ./obj/%.o, ${SRC})
 
 INC = ./inc
 
 ${TARTGET}:${OBJS}
-	gcc $^ -o $@
+	g++ $^ -o $@
 
-./obj/%.o:./src/%.c
-	gcc -c $< -I${INC} -o $@
+./obj/%.o:./src/%.cpp
+	g++ -c $< -I${INC} -o $@
 
 clean:
 	rm -rf ${OBJS} ${TARTGET}
